@@ -1,6 +1,6 @@
 const API_BASE = 'https://kinopoiskapiunofficial.tech/api/';
 const API_KEY = '4c088f10-ab90-49c9-832a-c023294928c4';
-const headers = { 'X-API-KEY': API_KEY, 'Content-Type': 'application/json' };
+const headers = { 'X-API-KEY': API_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json'}
 
 let currentPage = 1;
 let totalPages = 1;
@@ -9,14 +9,18 @@ let allMovies = [];
 async function fetchAPI(url) {
     try {
         const response = await fetch(url, { headers });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+            // Самое важное: читаем текст ошибки, который вернул сервер
+            const errorBody = await response.text();
+            console.error(`🛑 Ошибка HTTP ${response.status}:`, errorBody);
+            throw new Error(`HTTP ${response.status}: ${errorBody}`);
+        }
         return await response.json();
     } catch (error) {
-        console.error('Ошибка API:', error);
+        console.error('❌ Ошибка в fetchAPI:', error);
         return null;
     }
 }
-
 function getCurrentPage() {
     const path = window.location.pathname.split('/').pop();
     if (path === 'top20.html') return 'top20';
@@ -429,3 +433,8 @@ function renderFilmPage(film, actors, similar) {
         similarContainer.innerHTML = '<p style="color: #94a3b8;">Похожие фильмы не найдены.</p>';
     }
 }
+const headers = { 
+    'X-API-KEY': API_KEY, 
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'  // <--- ВАЖНО: добавляем эту строку
+};
