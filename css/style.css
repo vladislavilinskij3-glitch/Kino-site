@@ -787,3 +787,27 @@ footer {
     flex-direction: column;
   }
 }
+/* ==========================================================
+   КРАСИВАЯ КНОПКА ПОИСКА ДЛЯ ТОП-20
+   ========================================================== */
+.top-search-btn {
+    background: #37f0d8;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 24px;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Отступ между иконкой и текстом */
+}
+.top-search-btn:hover {
+    background: #59feeb;
+    transform: scale(1.02);
+}
+.top-search-btn i {
+    font-size: 1rem;
+}

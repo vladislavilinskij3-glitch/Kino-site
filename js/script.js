@@ -1,7 +1,6 @@
 const API_BASE = 'https://kinopoiskapiunofficial.tech/api/';
 const API_KEY = 'd4a54efa-0d5b-462e-b1c1-ef51222a49af';
 
-
 const API_HEADERS = { 
     'X-API-KEY': API_KEY, 
     'Content-Type': 'application/json',
@@ -31,6 +30,7 @@ async function fetchAPI(url) {
         return null;
     }
 }
+
 function getCurrentPage() {
     const path = window.location.pathname.split('/').pop();
     if (path === 'top20.html') return 'top20';
@@ -39,29 +39,23 @@ function getCurrentPage() {
 }
 
 // ==========================================================
-// ЗАГРУЗКА ФИЛЬМОВ (С обновленной обработкой ошибок)
+// ЗАГРУЗКА ФИЛЬМОВ
 // ==========================================================
 async function loadMovies(page = 1) {
     const pageType = getCurrentPage();
     let url = '';
     const params = new URLSearchParams(window.location.search);
-    const searchQuery = params.get('search');
     const topParam = parseInt(params.get('top')) || 20;
     currentPage = page;
 
     if (pageType === 'top20') {
         url = `${API_BASE}v2.2/films/collections?type=TOP_250_MOVIES&page=1`;
     } else {
-        if (searchQuery) {
-            url = `${API_BASE}v2.2/films/search?keyword=${encodeURIComponent(searchQuery)}&page=${page}`;
-        } else {
-            url = `${API_BASE}v2.2/films/collections?type=TOP_POPULAR_ALL&page=${page}`;
-        }
+        url = `${API_BASE}v2.2/films/collections?type=TOP_POPULAR_ALL&page=${page}`;
     }
 
     const data = await fetchAPI(url);
     
-    // Если данные не пришли или API вернул ошибку
     if (!data) {
         document.getElementById('movies-container').innerHTML = `
             <p style="text-align:center; color:#dc3545; padding:40px; font-size:1.2rem;">
@@ -75,27 +69,16 @@ async function loadMovies(page = 1) {
 
     const items = data.items || data.films || [];
 
-    // Если пришли данные, но список фильмов пуст (даже если нет поиска)
     if (items.length === 0) {
-        if (searchQuery) {
-            document.getElementById('movies-container').innerHTML = `
-                <p style="text-align:center; color:#94a3b8; padding:40px; font-size:1.2rem;">
-                    🤷 Ничего не найдено по запросу "<strong>${searchQuery}</strong>"
-                </p>
-            `;
-        } else {
-            document.getElementById('movies-container').innerHTML = `
-                <p style="text-align:center; color:#dc3545; padding:40px; font-size:1.2rem;">
-                    ⚠️ Не удалось загрузить список популярных фильмов.<br>
-                    Возможно, достигнут лимит запросов к API.
-                </p>
-            `;
-        }
+        document.getElementById('movies-container').innerHTML = `
+            <p style="text-align:center; color:#dc3545; padding:40px; font-size:1.2rem;">
+                ⚠️ Не удалось загрузить список фильмов.
+            </p>
+        `;
         document.getElementById('pagination').innerHTML = '';
         return;
     }
 
-    // Если всё успешно
     if (pageType === 'top20') {
         allMovies = items;
         applyFiltersAndSort(topParam);
@@ -142,7 +125,7 @@ function renderMovies(items) {
 }
 
 // ==========================================================
-// ЛОГИКА ДЛЯ TOP-20
+// ЛОГИКА ДЛЯ TOP-20 (ФИЛЬТРАЦИЯ И СОРТИРОВКА)
 // ==========================================================
 function applyFiltersAndSort(topLimitFromURL) {
     const params = new URLSearchParams(window.location.search);
@@ -152,6 +135,7 @@ function applyFiltersAndSort(topLimitFromURL) {
 
     let filtered = allMovies.slice(0, topLimit);
 
+    // Если есть текст поиска, фильтруем список локально
     if (searchText) {
         const lower = searchText.toLowerCase();
         filtered = filtered.filter(item => {
@@ -160,6 +144,7 @@ function applyFiltersAndSort(topLimitFromURL) {
         });
     }
 
+    // Сортировка
     if (order === 'new') {
         filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
     } else if (order === 'old') {
@@ -180,7 +165,11 @@ function applyFiltersAndSort(topLimitFromURL) {
 function renderTopList(items, startIndex) {
     const container = document.getElementById('movies-container');
     if (!items || items.length === 0) {
-        container.innerHTML = `<p style="text-align:center; padding:40px;">Ничего не найдено.</p>`;
+        container.innerHTML = `
+            <p style="text-align:center; color:#94a3b8; padding:40px; font-size:1.2rem;">
+                🤷 Ничего не найдено по вашему запросу.
+            </p>
+        `;
         return;
     }
 
@@ -265,19 +254,16 @@ function changePage(direction) {
 
     const pageType = getCurrentPage();
     const params = new URLSearchParams(window.location.search);
-    const searchQuery = params.get('search');
+    const top = params.get('top') || 20;
+    const order = params.get('order') || 'default';
 
     let url = '';
     if (pageType === 'top20') {
-        const top = params.get('top') || 20;
-        const search = params.get('search') || '';
-        const order = params.get('order') || 'default';
         url = `top20.html?top=${top}`;
-        if (search) url += `&search=${encodeURIComponent(search)}`;
         if (order !== 'default') url += `&order=${order}`;
         url += `&page=${newPage}`;
     } else {
-        url = `index.html?${searchQuery ? 'search=' + encodeURIComponent(searchQuery) + '&' : ''}page=${newPage}`;
+        url = `index.html?page=${newPage}`;
     }
     window.location.href = url;
 }
@@ -298,29 +284,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const searchInput = document.getElementById('search-input');
-    const searchBtn = document.getElementById('search-button');
-
-    if (searchBtn && searchInput) {
-        const performSearch = () => {
-            const val = searchInput.value.trim();
-            if (val) {
-                window.location.href = `index.html?search=${encodeURIComponent(val)}`;
-            }
-        };
-        searchBtn.addEventListener('click', performSearch);
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                performSearch();
-            }
-        });
-    }
-
+    // ОБРАБОТКА ПОИСКА В ТОП-20
     const topSearchInput = document.getElementById('top-search-input');
-    if (topSearchInput) {
-        topSearchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const val = e.target.value.trim();
+    const topSearchBtn = document.getElementById('top-search-btn');
+    
+    if (topSearchInput && topSearchBtn) {
+        const performTopSearch = () => {
+            const val = topSearchInput.value.trim();
+            if (val) {
                 const params = new URLSearchParams(window.location.search);
                 const top = params.get('top') || 20;
                 const order = params.get('order') || 'default';
@@ -328,6 +299,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (val) url += `&search=${encodeURIComponent(val)}`;
                 if (order !== 'default') url += `&order=${order}`;
                 window.location.href = url;
+            }
+        };
+
+        topSearchBtn.addEventListener('click', performTopSearch);
+        topSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performTopSearch();
             }
         });
     }
@@ -340,9 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const val = this.value;
             const params = new URLSearchParams(window.location.search);
             const top = params.get('top') || 20;
-            const search = params.get('search') || '';
             let url = `top20.html?top=${top}`;
-            if (search) url += `&search=${encodeURIComponent(search)}`;
             if (val !== 'default') url += `&order=${val}`;
             window.location.href = url;
         });
@@ -384,13 +360,18 @@ if (page === 'film') {
 }
 
 // ==========================================================
-// СТРАНИЦА ФИЛЬМА (film.html)
+// СТРАНИЦА ФИЛЬМА (film.html) - БЕЗ ИЗМЕНЕНИЙ
 // ==========================================================
 async function loadFilmPage() {
     const params = new URLSearchParams(window.location.search);
     const filmId = params.get('id');
-    if (!filmId) {
-        document.querySelector('.film-page').innerHTML = '<p style="color: #ef4444; text-align:center;">Фильм не найден.</p>';
+
+    if (!filmId || isNaN(parseInt(filmId))) {
+        document.querySelector('.film-page').innerHTML = `
+            <p style="color: #ef4444; text-align:center; padding:40px;">
+                ❌ Неверный ID фильма. Пожалуйста, вернитесь на главную страницу и попробуйте снова.
+            </p>
+        `;
         return;
     }
 

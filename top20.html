@@ -7,13 +7,6 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="images/icon.png">
-    <meta property="og:title" content="CINEMAHUB — популярные фильмы и рейтинги">
-    <meta property="og:description" content="Находи популярные фильмы, изучай рейтинги и выбирай, что посмотреть сегодня.">
-    <meta property="og:image" content="assets/images/icon-512.png">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://vladislavilinskij3-glitch.github.io/Kino-site/">
-        <!-- Иконка для вкладки браузера (Favicon) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png">
 </head>
 <body>
     <header>
@@ -36,6 +29,12 @@
                 </div>
                 <div class="top-filter">
                     <input type="text" id="top-search-input" class="top-search-input" placeholder="Название фильма">
+                    
+                    <!-- КРАСИВАЯ КНОПКА С ИКОНКОЙ -->
+                    <button id="top-search-btn" class="top-search-btn">
+                        <i class="fas fa-search"></i> Найти
+                    </button>
+                    
                     <select id="top-order-select" class="top-order-select">
                         <option value="default">По порядку</option>
                         <option value="new">Сначала новые</option>
