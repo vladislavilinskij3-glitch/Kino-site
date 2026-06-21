@@ -1,6 +1,12 @@
 const API_BASE = 'https://kinopoiskapiunofficial.tech/api/';
-const API_KEY = '4c088f10-ab90-49c9-832a-c023294928c4';
-const headers = { 'X-API-KEY': API_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json'}
+const API_KEY = 'd4a54efa-0d5b-462e-b1c1-ef51222a49af';
+
+
+const API_HEADERS = { 
+    'X-API-KEY': API_KEY, 
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+};
 
 let currentPage = 1;
 let totalPages = 1;
@@ -8,14 +14,18 @@ let allMovies = [];
 
 async function fetchAPI(url) {
     try {
-        const response = await fetch(url, { headers });
+        const response = await fetch(url, { headers: API_HEADERS });
         if (!response.ok) {
-            // Самое важное: читаем текст ошибки, который вернул сервер
             const errorBody = await response.text();
             console.error(`🛑 Ошибка HTTP ${response.status}:`, errorBody);
-            throw new Error(`HTTP ${response.status}: ${errorBody}`);
+            return null;
         }
-        return await response.json();
+        const data = await response.json();
+        if (data.error || data.message) {
+            console.error('⚠️ Ошибка от API:', data.message);
+            return null;
+        }
+        return data;
     } catch (error) {
         console.error('❌ Ошибка в fetchAPI:', error);
         return null;
@@ -29,7 +39,7 @@ function getCurrentPage() {
 }
 
 // ==========================================================
-// ЗАГРУЗКА ФИЛЬМОВ (с исправленной логикой вывода ошибок и пустых результатов)
+// ЗАГРУЗКА ФИЛЬМОВ (С обновленной обработкой ошибок)
 // ==========================================================
 async function loadMovies(page = 1) {
     const pageType = getCurrentPage();
@@ -51,11 +61,12 @@ async function loadMovies(page = 1) {
 
     const data = await fetchAPI(url);
     
-    // Если данные не пришли (ошибка соединения, блокировка CORS и т.д.)
+    // Если данные не пришли или API вернул ошибку
     if (!data) {
         document.getElementById('movies-container').innerHTML = `
             <p style="text-align:center; color:#dc3545; padding:40px; font-size:1.2rem;">
-                ⚠️ Ошибка соединения с сервером. Проверьте консоль браузера (F12) или попробуйте позже.
+                ⚠️ Ошибка соединения с сервером или неверный API-ключ.<br>
+                Проверьте консоль браузера (F12) или замените ключ API.
             </p>
         `;
         document.getElementById('pagination').innerHTML = '';
@@ -64,13 +75,22 @@ async function loadMovies(page = 1) {
 
     const items = data.items || data.films || [];
 
-    // Если поиск ничего не дал
-    if (items.length === 0 && searchQuery) {
-        document.getElementById('movies-container').innerHTML = `
-            <p style="text-align:center; color:#94a3b8; padding:40px; font-size:1.2rem;">
-                🤷 Ничего не найдено по запросу "<strong>${searchQuery}</strong>"
-            </p>
-        `;
+    // Если пришли данные, но список фильмов пуст (даже если нет поиска)
+    if (items.length === 0) {
+        if (searchQuery) {
+            document.getElementById('movies-container').innerHTML = `
+                <p style="text-align:center; color:#94a3b8; padding:40px; font-size:1.2rem;">
+                    🤷 Ничего не найдено по запросу "<strong>${searchQuery}</strong>"
+                </p>
+            `;
+        } else {
+            document.getElementById('movies-container').innerHTML = `
+                <p style="text-align:center; color:#dc3545; padding:40px; font-size:1.2rem;">
+                    ⚠️ Не удалось загрузить список популярных фильмов.<br>
+                    Возможно, достигнут лимит запросов к API.
+                </p>
+            `;
+        }
         document.getElementById('pagination').innerHTML = '';
         return;
     }
@@ -87,7 +107,7 @@ async function loadMovies(page = 1) {
 }
 
 // ==========================================================
-// ОТРИСОВКА ОБЫЧНЫХ КАРТОЧЕК (index.html)
+// ОТРИСОВКА КАРТОЧЕК (index.html)
 // ==========================================================
 function renderMovies(items) {
     const container = document.getElementById('movies-container');
@@ -122,7 +142,7 @@ function renderMovies(items) {
 }
 
 // ==========================================================
-// ЛОГИКА ДЛЯ TOP-20 И СОРТИРОВКА
+// ЛОГИКА ДЛЯ TOP-20
 // ==========================================================
 function applyFiltersAndSort(topLimitFromURL) {
     const params = new URLSearchParams(window.location.search);
@@ -433,8 +453,3 @@ function renderFilmPage(film, actors, similar) {
         similarContainer.innerHTML = '<p style="color: #94a3b8;">Похожие фильмы не найдены.</p>';
     }
 }
-const headers = { 
-    'X-API-KEY': API_KEY, 
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'  // <--- ВАЖНО: добавляем эту строку
-};
