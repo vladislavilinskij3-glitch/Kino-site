@@ -19,13 +19,13 @@ async function fetchAPI(url) {
 
 function getCurrentPage() {
     const path = window.location.pathname.split('/').pop();
-    if (path === 'top20.html') return 'top20'; // Изменено с top250 на top20
+    if (path === 'top20.html') return 'top20';
     if (path === 'film.html') return 'film';
     return 'index';
 }
 
 // ==========================================================
-// ЗАГРУЗКА ФИЛЬМОВ
+// ЗАГРУЗКА ФИЛЬМОВ (с исправленной логикой вывода ошибок и пустых результатов)
 // ==========================================================
 async function loadMovies(page = 1) {
     const pageType = getCurrentPage();
@@ -35,7 +35,7 @@ async function loadMovies(page = 1) {
     const topParam = parseInt(params.get('top')) || 20;
     currentPage = page;
 
-    if (pageType === 'top20') { // Изменено с 'top250'
+    if (pageType === 'top20') {
         url = `${API_BASE}v2.2/films/collections?type=TOP_250_MOVIES&page=1`;
     } else {
         if (searchQuery) {
@@ -46,52 +46,40 @@ async function loadMovies(page = 1) {
     }
 
     const data = await fetchAPI(url);
-    if (data) {
-        if (pageType === 'top20') { // Изменено с 'top250'
-            allMovies = data.items || data.films || [];
-            applyFiltersAndSort(topParam);
-        } else {
-            totalPages = data.totalPages || data.pages || 1;
-            renderPagination();
-            renderMovies(data.items || data.films || []);
-        }
-    }
-}
-
-// ==========================================================
-// ПРИМЕНЕНИЕ ФИЛЬТРОВ И ПАГИНАЦИИ (только ТОП-10 и ТОП-20)
-// ==========================================================
-function applyFiltersAndSort(topLimitFromURL) {
-    const params = new URLSearchParams(window.location.search);
-    const topLimit = topLimitFromURL || parseInt(params.get('top')) || 20;
-    const searchText = params.get('search') || '';
-    const order = params.get('order') || 'default';
-
-    let filtered = allMovies.slice(0, topLimit);
-
-    if (searchText) {
-        const lower = searchText.toLowerCase();
-        filtered = filtered.filter(item => {
-            const title = (item.nameRu || item.nameEn || '').toLowerCase();
-            return title.includes(lower);
-        });
+    
+    // Если данные не пришли (ошибка соединения, блокировка CORS и т.д.)
+    if (!data) {
+        document.getElementById('movies-container').innerHTML = `
+            <p style="text-align:center; color:#dc3545; padding:40px; font-size:1.2rem;">
+                ⚠️ Ошибка соединения с сервером. Проверьте консоль браузера (F12) или попробуйте позже.
+            </p>
+        `;
+        document.getElementById('pagination').innerHTML = '';
+        return;
     }
 
-    if (order === 'new') {
-        filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
-    } else if (order === 'old') {
-        filtered.sort((a, b) => (a.year || 0) - (b.year || 0));
+    const items = data.items || data.films || [];
+
+    // Если поиск ничего не дал
+    if (items.length === 0 && searchQuery) {
+        document.getElementById('movies-container').innerHTML = `
+            <p style="text-align:center; color:#94a3b8; padding:40px; font-size:1.2rem;">
+                🤷 Ничего не найдено по запросу "<strong>${searchQuery}</strong>"
+            </p>
+        `;
+        document.getElementById('pagination').innerHTML = '';
+        return;
     }
 
-    const itemsPerPage = 15;
-    totalPages = Math.ceil(filtered.length / itemsPerPage);
-    if (currentPage > totalPages) currentPage = totalPages;
-
-    const start = (currentPage - 1) * itemsPerPage;
-    const paginated = filtered.slice(start, start + itemsPerPage);
-
-    renderTopList(paginated, start);
-    renderTopPagination();
+    // Если всё успешно
+    if (pageType === 'top20') {
+        allMovies = items;
+        applyFiltersAndSort(topParam);
+    } else {
+        totalPages = data.totalPages || data.pages || 1;
+        renderPagination();
+        renderMovies(items);
+    }
 }
 
 // ==========================================================
@@ -130,8 +118,41 @@ function renderMovies(items) {
 }
 
 // ==========================================================
-// ОТРИСОВКА СПИСКА (top20.html)
+// ЛОГИКА ДЛЯ TOP-20 И СОРТИРОВКА
 // ==========================================================
+function applyFiltersAndSort(topLimitFromURL) {
+    const params = new URLSearchParams(window.location.search);
+    const topLimit = topLimitFromURL || parseInt(params.get('top')) || 20;
+    const searchText = params.get('search') || '';
+    const order = params.get('order') || 'default';
+
+    let filtered = allMovies.slice(0, topLimit);
+
+    if (searchText) {
+        const lower = searchText.toLowerCase();
+        filtered = filtered.filter(item => {
+            const title = (item.nameRu || item.nameEn || '').toLowerCase();
+            return title.includes(lower);
+        });
+    }
+
+    if (order === 'new') {
+        filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
+    } else if (order === 'old') {
+        filtered.sort((a, b) => (a.year || 0) - (b.year || 0));
+    }
+
+    const itemsPerPage = 15;
+    totalPages = Math.ceil(filtered.length / itemsPerPage);
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * itemsPerPage;
+    const paginated = filtered.slice(start, start + itemsPerPage);
+
+    renderTopList(paginated, start);
+    renderTopPagination();
+}
+
 function renderTopList(items, startIndex) {
     const container = document.getElementById('movies-container');
     if (!items || items.length === 0) {
@@ -166,7 +187,7 @@ function renderTopList(items, startIndex) {
 }
 
 // ==========================================================
-// ПАГИНАЦИЯ ДЛЯ TOP-20 (КРУГЛЫЕ СТРЕЛКИ)
+// ПАГИНАЦИЯ
 // ==========================================================
 function renderTopPagination() {
     const container = document.getElementById('pagination');
@@ -223,7 +244,7 @@ function changePage(direction) {
     const searchQuery = params.get('search');
 
     let url = '';
-    if (pageType === 'top20') { // Изменено с 'top250'
+    if (pageType === 'top20') {
         const top = params.get('top') || 20;
         const search = params.get('search') || '';
         const order = params.get('order') || 'default';
@@ -238,7 +259,7 @@ function changePage(direction) {
 }
 
 // ==========================================================
-// ОБРАБОТЧИКИ СОБЫТИЙ
+// ИНИЦИАЛИЗАЦИЯ И ОБРАБОТЧИКИ СОБЫТИЙ
 // ==========================================================
 document.addEventListener('DOMContentLoaded', function() {
     const pageType = getCurrentPage();
@@ -250,6 +271,24 @@ document.addEventListener('DOMContentLoaded', function() {
         tabBtns.forEach(btn => {
             btn.classList.remove('active');
             if (btn.dataset.top === currentTop) btn.classList.add('active');
+        });
+    }
+
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-button');
+
+    if (searchBtn && searchInput) {
+        const performSearch = () => {
+            const val = searchInput.value.trim();
+            if (val) {
+                window.location.href = `index.html?search=${encodeURIComponent(val)}`;
+            }
+        };
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
         });
     }
 
@@ -284,18 +323,21 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = url;
         });
     }
-});
 
-document.getElementById('subscribe-newsletter-btn')?.addEventListener('click', () => {
-    const input = document.getElementById('newsletter-email');
-    const email = input.value.trim();
-    if (!email || !email.includes('@')) {
-        alert('Пожалуйста, введите корректный Email!');
-        return;
+    const subBtn = document.getElementById('subscribe-newsletter-btn');
+    if (subBtn) {
+        subBtn.addEventListener('click', () => {
+            const input = document.getElementById('newsletter-email');
+            const email = input.value.trim();
+            if (!email || !email.includes('@')) {
+                alert('Пожалуйста, введите корректный Email!');
+                return;
+            }
+            console.log(`📧 Подписка оформлена на email: ${email}`);
+            alert(`Спасибо, ${email}! Вы подписались на новости.`);
+            input.value = '';
+        });
     }
-    console.log(`📧 Подписка оформлена на email: ${email}`);
-    alert(`Спасибо, ${email}! Вы подписались на новости.`);
-    input.value = '';
 });
 
 const navLinks = document.querySelectorAll('nav a');
@@ -318,7 +360,7 @@ if (page === 'film') {
 }
 
 // ==========================================================
-// СТРАНИЦА ФИЛЬМА (БЕЗ ИЗМЕНЕНИЙ)
+// СТРАНИЦА ФИЛЬМА (film.html)
 // ==========================================================
 async function loadFilmPage() {
     const params = new URLSearchParams(window.location.search);
