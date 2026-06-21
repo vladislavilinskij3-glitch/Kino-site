@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Киносайт — Топ фильмов</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png">
+    <meta property="og:title" content="CINEMAHUB — популярные фильмы и рейтинги">
+    <meta property="og:description" content="Находи популярные фильмы, изучай рейтинги и выбирай, что посмотреть сегодня.">
+    <meta property="og:image" content="assets/images/icon-512.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vladislavilinskij3-glitch.github.io/Lego-site">
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <div class="logo"><a href="index.html">CINEMA<span style="-webkit-text-fill-color: #94a3b8;">HUB</span></a></div>
+            <nav>
+                <a href="index.html">Главная</a>
+                <a href="top20.html">Топ 20</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container top-page">
+        <div class="top-header">
+            <h2>ТОП фильмов</h2>
+            <div class="top-controls">
+                <div class="top-tabs">
+                    <a href="?top=10" class="tab-btn" data-top="10">ТОП-10</a>
+                    <a href="?top=20" class="tab-btn active" data-top="20">ТОП-20</a>
+                </div>
+                <div class="top-filter">
+                    <input type="text" id="top-search-input" class="top-search-input" placeholder="Название фильма">
+                    <select id="top-order-select" class="top-order-select">
+                        <option value="default">По порядку</option>
+                        <option value="new">Сначала новые</option>
+                        <option value="old">Сначала старые</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="movies-container" class="movies-list"></div>
+        <div id="pagination" class="top-pagination"></div>
+    </main>
+
+    <section class="newsletter-section">
+        <div class="container">
+            <h2>Получай киноновинки первым</h2>
+            <p>Оставь email, чтобы получать подборки фильмов, новости проекта и рекомендации для просмотра.</p>
+            <div class="newsletter-form">
+                <input type="email" id="newsletter-email" placeholder="Введите ваш email">
+                <button id="subscribe-newsletter-btn">Подписаться</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-col">
+                    <h4>Киносайт</h4>
+                    <ul>
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="top20.html">Топ 20</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>О платформе</h4>
+                    <ul>
+                        <li><a href="#">О нас</a></li>
+                        <li><a href="#">Политика конфиденциальности</a></li>
+                        <li><a href="#">Контакты</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Контакты</h4>
+                    <div class="footer-contact">
+                        <p>info@kinosite.ru</p>
+                        <p>+7 (999) 123-45-67</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Киносайт. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

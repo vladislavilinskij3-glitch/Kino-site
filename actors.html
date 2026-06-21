@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+   <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>КиноПортал — актёры</title>
+<meta property="og:title" content="CINEMAHUB — популярные фильмы и рейтинги">
+    <meta property="og:description" content="Находи популярные фильмы, изучай рейтинги и выбирай, что посмотреть сегодня.">
+    <meta property="og:image" content="assets/images/icon-512.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vladislavilinskij3-glitch.github.io/Lego-ste"> </head>
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <div class="logo"><a href="index.html">CINEMA<span style="-webkit-text-fill-color: #94a3b8;">HUB</span></a></div>
+            <nav>
+                <a href="index.html">Главная</a>
+                <a href="top20.html">Топ 20</a>
+                <a href="actors.html">Актёры</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="search-container">
+            <input type="text" id="actors-search-input" class="search-input" placeholder="Введите имя актёра (на английском)...">
+            <button id="actors-search-button" class="search-btn">Найти</button>
+        </div>
+
+        <h2 style="color:#fff; margin-top:20px;">🎭 Поиск актёров</h2>
+        <div id="actors-container" class="actors-grid"></div>
+        <div id="pagination"></div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>CINEMAHUB</h4>
+                    <p>Сайт разработан для итоговой аттестации с использованием API Кинопоиска.</p>
+                    <a href="https://github.com/vladislavilinskij3-glitch" target="_blank" style="display:inline-block; margin-top:10px;">Мой GitHub</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Подпишитесь на новости</h4>
+                    <p>Узнавайте о новинках кино первыми!</p>
+                    <div class="subscribe-box">
+                        <input type="email" id="subscribe-email" placeholder="Ваш Email">
+                        <button id="subscribe-btn">Подписаться</button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Киносайт. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

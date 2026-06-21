@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Киносайт — Фильм</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png">
+        
+    <meta property="og:title" content="CINEMAHUB — популярные фильмы и рейтинги">
+    <meta property="og:description" content="Находи популярные фильмы, изучай рейтинги и выбирай, что посмотреть сегодня.">
+    <meta property="og:image" content="assets/images/icon-512.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vladislavilinskij3-glitch.github.io/Lego-site">
+
+    <!-- Теги для PWA и цветовой палитры мобильных браузеров -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2dd4bf">
+</head>
+<body>
+    <header>
+        <div class="container header-inner">
+            <div class="logo"><a href="index.html">CINEMA<span style="-webkit-text-fill-color: #94a3b8;">HUB</span></a></div>
+            <nav>
+                <a href="index.html">Главная</a>
+                <a href="top20.html">Топ 20</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="film-page">
+        <div class="container">
+            <div class="film-hero">
+                <img id="film-poster" src="" alt="Постер фильма" class="film-poster-large">
+                <div class="film-info">
+                    <h1 id="film-title">Загрузка...</h1>
+                    <div id="film-tags" class="film-tags"></div>
+                    <div id="film-rating" class="film-rating-large">⭐ 0.0</div>
+                    <p id="film-description" class="film-description">Описание загружается...</p>
+                </div>
+            </div>
+
+            <div class="cast-section">
+                <h3>Актерский состав</h3>
+                <div id="cast-list" class="cast-list"></div>
+            </div>
+
+            <div class="similar-section">
+                <h3>Фильмы с похожим годом</h3>
+                <div id="similar-grid" class="similar-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <section class="newsletter-section">
+        <div class="container">
+            <h2>Получай киноновинки первым</h2>
+            <p>Оставь email, чтобы получать подборки фильмов, новости проекта и рекомендации для просмотра.</p>
+            <div class="newsletter-form">
+                <input type="email" id="newsletter-email" placeholder="Введите ваш email">
+                <button id="subscribe-newsletter-btn">Подписаться</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-col">
+                    <h4>Киносайт</h4>
+                    <ul>
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="top20.html">Топ 20</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>О платформе</h4>
+                    <ul>
+                        <li><a href="#">О нас</a></li>
+                        <li><a href="#">Политика конфиденциальности</a></li>
+                        <li><a href="#">Контакты</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Контакты</h4>
+                    <div class="footer-contact">
+                        <p>info@kinosite.ru</p>
+                        <p>+7 (999) 123-45-67</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 Киносайт. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
