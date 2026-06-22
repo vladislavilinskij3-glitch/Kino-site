@@ -16,17 +16,17 @@ async function fetchAPI(url) {
         const response = await fetch(url, { headers: API_HEADERS });
         if (!response.ok) {
             const errorBody = await response.text();
-            console.error(`🛑 Ошибка HTTP ${response.status}:`, errorBody);
+            console.error(`Ошибка HTTP ${response.status}:`, errorBody);
             return null;
         }
         const data = await response.json();
         if (data.error || data.message) {
-            console.error('⚠️ Ошибка от API:', data.message);
+            console.error(' Ошибка от API:', data.message);
             return null;
         }
         return data;
     } catch (error) {
-        console.error('❌ Ошибка в fetchAPI:', error);
+        console.error(' Ошибка в fetchAPI:', error);
         return null;
     }
 }
@@ -38,7 +38,7 @@ function getCurrentPage() {
     return 'index';
 }
 
-// ==========================================================
+
 // ЗАГРУЗКА ФИЛЬМОВ
 // ==========================================================
 async function loadMovies(page = 1) {
@@ -360,7 +360,7 @@ if (page === 'film') {
 }
 
 // ==========================================================
-// СТРАНИЦА ФИЛЬМА (film.html) - БЕЗ ИЗМЕНЕНИЙ
+// СТРАНИЦА ФИЛЬМА (film.html) 
 // ==========================================================
 async function loadFilmPage() {
     const params = new URLSearchParams(window.location.search);
